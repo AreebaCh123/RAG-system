@@ -1,0 +1,20 @@
+"venv/" 
+"dsm5_rag_chatbot/venv/" 
+"dsm5_rag_chatbot/venv/" 
+# Python and virtual environments
+**/venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# IDE and OS files
+.idea/
+.vscode/
+*.log
+*.DS_Store
+
+# FAISS index files (large binary)
+faiss_dsm5_index/
