@@ -9,6 +9,7 @@ from langchain.chains import create_history_aware_retriever, create_retrieval_ch
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.documents import Document
+from prompt import build_system_prompt, CONTEXTUALIZE_PROMPT
 import numpy as np
 from config import INDEX_NAME, EMBEDDING_MODEL
 
@@ -210,20 +211,20 @@ ISSUES: [List specific unsupported claims, or "None"]
             return "VERY_LOW"
 
 
+
 def get_enhanced_conversational_rag_chain(use_reranking=True):
     """
     Creates and returns an enhanced conversational RAG chain with streaming support.
     """
     print("🔗 Initializing enhanced conversational RAG chain...")
 
-    # Streaming LLM for chat responses
     streaming_llm = ChatOpenAI(
         model="gpt-4o-mini",
-        temperature=0.2,
+        temperature=0.3, 
         streaming=True
     )
     
-    # Non-streaming LLM for validation (to avoid interference)
+    # Non-streaming LLM for validation
     validation_llm = ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0,
@@ -239,88 +240,71 @@ def get_enhanced_conversational_rag_chain(use_reranking=True):
     # Initialize validator
     validator = ResponseValidator(validation_llm)
 
-    # Create the History-Aware Retriever
-    contextualize_q_system_prompt = (
-        "Given a chat history and the latest user question that might reference "
-        "earlier context, reformulate it into a standalone question. "
-        "Do NOT answer the question—just reformulate it if needed."
-    )
-    contextualize_q_prompt = ChatPromptTemplate.from_messages([
-        ("system", contextualize_q_system_prompt),
-        MessagesPlaceholder("chat_history"),
-        ("human", "{input}"),
-    ])
-
-    # Create the Question-Answering Chain with streaming
-    qa_system_prompt = (
-        "You are **MindMate**, an empathetic and evidence-based AI mental health assistant. "
-        "Your role is to provide supportive, safe, and clinically responsible information. "
-        "Follow these strict role conditioning rules:\n"
-        "1. NEVER give medical diagnoses, treatment plans, or prescribe medication.\n"
-        "2. ONLY use the provided context to inform your response. NEVER add information not in the context.\n"
-        "3. If the context lacks enough information, clearly say so.\n"
-        "4. Always encourage the user to seek help from a licensed human professional.\n"
-        "5. Maintain a tone that is calm, warm, and reassuring at all times.\n"
-        "6. Be explicit when you're uncertain or when information is limited.\n\n"
-        "Context:\n{context}"
-    )
-    qa_prompt = ChatPromptTemplate.from_messages([
-        ("system", qa_system_prompt),
-        MessagesPlaceholder("chat_history"),
-        ("human", "{input}"),
-    ])
-    
-    question_answer_chain = create_stuff_documents_chain(streaming_llm, qa_prompt)
-
-    print("Enhanced conversational RAG chain initialized successfully.")
-    return advanced_retriever, question_answer_chain, validator
+    print("✅ Enhanced conversational RAG chain initialized successfully.")
+    return advanced_retriever, streaming_llm, validator
 
 
 def stream_response_with_validation(query: str, chat_history: list, 
-                                    retriever, qa_chain, validator) -> Dict:
+                                    retriever, llm, validator) -> Dict:
     """
-    Process query with streaming and post-validation
+    Process query with streaming and post-validation using therapeutic prompts
     """
     # Step 1: Retrieve documents with dynamic k and reranking
     context_docs = retriever.retrieve(query)
     
-    # Step 2: Stream the response
+    # Step 2: Build context string from retrieved documents
+    context_text = "\n\n---\n\n".join([
+        f"[Source: {doc.metadata.get('source', 'Unknown')}]\n{doc.page_content}"
+        for doc in context_docs
+    ])
+    
+    # Step 3: Build complete therapeutic system prompt
+    system_prompt = build_system_prompt(context_text)
+    
+    # Step 4: Prepare messages for LLM
+    messages = [
+        {"role": "system", "content": system_prompt}
+    ]
+    
+    # Add chat history
+    for msg in chat_history:
+        if isinstance(msg, HumanMessage):
+            messages.append({"role": "user", "content": msg.content})
+        elif isinstance(msg, AIMessage):
+            messages.append({"role": "assistant", "content": msg.content})
+    
+    # Add current query
+    messages.append({"role": "user", "content": query})
+    
+    # Step 5: Stream the response
     print("\n🤖 MindMate: ", end="", flush=True)
     
     full_response = ""
     try:
         # Stream tokens
-        for chunk in qa_chain.stream({
-            "input": query,
-            "context": context_docs,
-            "chat_history": chat_history
-        }):
-            if chunk:
-                print(chunk, end="", flush=True)
-                full_response += chunk
+        for chunk in llm.stream(messages):
+            if chunk.content:
+                print(chunk.content, end="", flush=True)
+                full_response += chunk.content
         
         print()  # New line after streaming
         
     except Exception as e:
-        print(f"\n Streaming error: {e}")
+        print(f"\n❌ Streaming error: {e}")
         # Fallback to non-streaming
-        response = qa_chain.invoke({
-            "input": query,
-            "context": context_docs,
-            "chat_history": chat_history
-        })
-        full_response = response if isinstance(response, str) else response.get("answer", "")
+        response = llm.invoke(messages)
+        full_response = response.content
         print(f"\n🤖 MindMate: {full_response}")
     
-    # Step 3: Post-streaming validation (happens in background, doesn't block)
-    print("\nAnalyzing response...", end="", flush=True)
+    # Step 6: Post-streaming validation
+    print("\n🔍 Analyzing response...", end="", flush=True)
     
     validation_result = validator.check_hallucination(full_response, context_docs)
     confidence_result = validator.calculate_confidence_score(
         full_response, context_docs, validation_result
     )
     
-    print("\r" + " " * 30 + "\r", end="", flush=True)  # Clear "Analyzing..." message
+    print("\r" + " " * 30 + "\r", end="", flush=True)  # Clear message
     
     return {
         "answer": full_response,
@@ -329,18 +313,19 @@ def stream_response_with_validation(query: str, chat_history: list,
         "confidence": confidence_result
     }
 
-
 if __name__ == "__main__":
     # Initialize enhanced system with streaming
-    retriever, qa_chain, validator = get_enhanced_conversational_rag_chain(use_reranking=True)
+    retriever, llm, validator = get_enhanced_conversational_rag_chain(use_reranking=True)
     chat_history = []
     
     print("\n" + "="*70)
-    print("Enhanced MindMate Chatbot - With Streaming & Advanced RAG")
+    print("🧠 MindMate - Your Mental Health Companion")
     print("="*70)
-    rerank_status = "Enabled" if CROSSENCODER_AVAILABLE else "❌ Disabled (install sentence-transformers)"
-    print(f"Features: Real-time Streaming | Dynamic Retrieval | Reranking {rerank_status}")
-    print("Plus: Hallucination Detection | Confidence Scoring")
+    rerank_status = " Enabled" if CROSSENCODER_AVAILABLE else "❌ Disabled (install sentence-transformers)"
+    print(f"✨ Features: Therapeutic AI | Evidence-Based Support | Crisis Awareness")
+    print(f"🔄 Reranking: {rerank_status}")
+    print(f"📊 Confidence Scoring | Hallucination Detection")
+    print("\n💡 This chatbot provides support but is NOT a replacement for therapy.")
     print("Type 'exit' to end the conversation.\n")
     
     # Create logs directory
@@ -349,8 +334,8 @@ if __name__ == "__main__":
     
     while True:
         user_input = input("\n💬 You: ").strip()
-        if user_input.lower() == 'exit':
-            print("\n🌿 MindMate: Goodbye! Take care of yourself.")
+        if user_input.lower() in ['exit', 'quit', 'bye']:
+            print("\n🌿 MindMate: Thank you for sharing with me today. Remember, you're not alone. Take care. 💙")
             break
         
         if not user_input:
@@ -359,7 +344,7 @@ if __name__ == "__main__":
         try:
             # Process with streaming and validation
             result = stream_response_with_validation(
-                user_input, chat_history, retriever, qa_chain, validator
+                user_input, chat_history, retriever, llm, validator
             )
             
             answer = result['answer']
@@ -368,7 +353,7 @@ if __name__ == "__main__":
             
             # Display confidence information
             confidence_emoji = "🟢" if confidence['level'] == "HIGH" else "🟡" if confidence['level'] == "MEDIUM" else "🔴"
-            print(f"{confidence_emoji} Confidence: {confidence['level']} ({confidence['overall_confidence']}%)")
+            print(f"\n{confidence_emoji} Confidence: {confidence['level']} ({confidence['overall_confidence']}%)")
             
             # Warning if hallucination detected
             if validation['hallucination']:
@@ -379,7 +364,7 @@ if __name__ == "__main__":
                 f.write(f"You: {user_input}\n")
                 f.write(f"MindMate: {answer}\n")
                 f.write(f"Confidence: {confidence['level']} ({confidence['overall_confidence']}%)\n")
-                f.write(f"Hallucination Check: {'FLAGGED' if validation['hallucination'] else '✓ PASSED'}\n")
+                f.write(f"Hallucination Check: {'FLAGGED' if validation['hallucination'] else '✅ PASSED'}\n")
                 f.write("-" * 70 + "\n\n")
             
             # Update chat history
@@ -391,7 +376,7 @@ if __name__ == "__main__":
                 chat_history = chat_history[-20:]
                 
         except Exception as e:
-            print(f"\n MindMate: Sorry, I'm having trouble processing that right now.")
+            print(f"\n❌ MindMate: Sorry, I'm having trouble processing that right now.")
             print(f"   Debug: {str(e)}")
             with open(log_file, "a", encoding="utf-8") as f:
                 f.write(f"ERROR: {e}\n\n")
