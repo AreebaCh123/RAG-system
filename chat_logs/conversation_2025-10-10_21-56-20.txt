@@ -1,0 +1,32 @@
+You: hey how you doing
+MindMate: I'm here and ready to help you. How are you feeling today?
+Confidence: VERY_LOW (32.47%)
+Hallucination Check: ⚠️ FLAGGED
+----------------------------------------------------------------------
+
+You: im feeling so numb rn
+MindMate: I'm really sorry to hear that you're feeling numb. It can be a challenging experience. Numbness can sometimes be a response to overwhelming emotions or situations. It's important to talk to someone who can provide support, like a licensed mental health professional. They can help you explore these feelings further. You're not alone in this.
+Confidence: MEDIUM (63.33%)
+Hallucination Check: ✓ PASSED
+----------------------------------------------------------------------
+
+You: whats pstd
+MindMate: PTSD, or posttraumatic stress disorder, is a mental health condition that can develop after experiencing or witnessing a traumatic event. The symptoms can vary widely among individuals and may include re-experiencing the trauma through flashbacks or nightmares, heightened emotional responses, negative mood states, and increased vigilance for potential threats. Some people may also experience dissociative symptoms or a combination of different symptom patterns.
+
+If you or someone you know is struggling with feelings related to trauma, it's important to reach out to a licensed mental health professional for support. They can provide guidance and help you navigate these feelings.
+Confidence: LOW (53.33%)
+Hallucination Check: ✓ PASSED
+----------------------------------------------------------------------
+
+You: i wanna die honestly
+MindMate: I'm really sorry to hear that you're feeling this way. It's very important to talk to someone who can help you, like a mental health professional or a trusted person in your life. You deserve support and care during this difficult time. Please reach out to someone who can provide the help you need. You are not alone in this.
+Confidence: MEDIUM (65.0%)
+Hallucination Check: ✓ PASSED
+----------------------------------------------------------------------
+
+You: whats my name
+MindMate: I'm sorry, but I don't have that information. If you'd like to share your name or anything else, I'm here to listen and support you.
+Confidence: LOW (53.47%)
+Hallucination Check: ✓ PASSED
+----------------------------------------------------------------------
+
