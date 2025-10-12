@@ -20,7 +20,7 @@ env/
 .env
 *.env
 .env.*
-!env.template  # keep env.template visible
+env.template
 
 
 # -----------------------
