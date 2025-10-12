@@ -1,0 +1,24 @@
+You: hey tell me whats my name
+MindMate: It sounds like you're feeling a bit playful or maybe curious! I can't know your name unless you share it with me. What would you like me to call you?
+Confidence: HIGH (90.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: no i told u my name before. tell me what is it
+MindMate: I hear that you're feeling a bit frustrated about this. It can be really annoying when something feels forgotten or overlooked. Can you remind me of your name? I'm here to listen and support you!
+Confidence: HIGH (90.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: do u still remember my name?
+MindMate: It sounds like you're feeling a bit disappointed or maybe even a little confused about this. I wish I could remember your name, but I don't have the ability to recall past conversations. Can you remind me of your name? I'm here to support you!
+Confidence: HIGH (85.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: i told u about my grandmothers disease what is it?
+MindMate: I can hear that you're feeling concerned about your grandmother's health. It’s understandable to want to talk about something that’s weighing on your mind. Can you share a bit more about what you're feeling or what specific aspects of her illness are on your mind? I'm here to listen and support you.
+Confidence: HIGH (95.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+

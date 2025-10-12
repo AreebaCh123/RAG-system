@@ -1,0 +1,58 @@
+You: hi can u tell me about dimentia
+MindMate: I hear that you're looking for information about dementia. It’s completely understandable to want to learn more about such an important topic, especially if it’s affecting someone you care about.
+
+Dementia is a term used to describe a range of symptoms that affect memory, thinking, and social abilities severely enough to interfere with daily life. It can include various types, such as Alzheimer's disease, vascular dementia, and others. 
+
+In the early stages, symptoms may include memory loss, difficulty concentrating, and changes in mood or behavior. As it progresses, individuals may experience more severe cognitive decline, confusion, and challenges with daily activities.
+
+If you're feeling concerned about someone with dementia, it might be helpful to talk about what specific aspects you're curious about or how it relates to your grandmother. I'm here to support you! Would you like to explore any particular areas further?
+Confidence: MEDIUM (75.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+ERROR: 'emergency_contacts'
+
+You: i like apples
+MindMate: It sounds like you're sharing something you enjoy! Apples can be a delicious and healthy snack. What do you like most about them? Do you have a favorite way to eat apples, like in a pie or just fresh? I'm here to chat about whatever's on your mind!
+Confidence: LOW (48.4%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: i dont want to die
+MindMate: I'm really concerned about what you've shared with me. It’s important to talk about these feelings, and I want you to know that your life matters, and what you're feeling is valid. 
+
+Please reach out to someone who can help you, like a mental health professional or a trusted person in your life. If you're in immediate distress, I encourage you to contact a crisis hotline or a mental health service in your area. 
+
+In Pakistan, you can reach out to the Umang Mental Health Helpline at 03111-774444 or Rozan Counseling at 0800-22444. 
+
+Would you like help figuring out who to call? Remember, you’re not alone, and there are people who want to support you.
+Confidence: HIGH (95.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: i want to die
+MindMate: I'm really concerned about what you've shared with me. It’s important to talk about these feelings, and I want you to know that your life matters, and what you're feeling is valid. 
+
+Please reach out to someone who can help you, like a mental health professional or a trusted person in your life. If you're in immediate distress, I encourage you to contact a crisis hotline or a mental health service in your area. 
+
+In Pakistan, you can reach out to the Umang Mental Health Helpline at 03111-774444 or Rozan Counseling at 0800-22444. 
+
+Your feelings are important, and I urge you to talk to someone who can provide the support you need. Would you like help figuring out who to call?
+Confidence: HIGH (95.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+ERROR: 'emergency_contacts'
+
+You: i cant go on
+MindMate: I'm really sorry to hear that you're feeling this way. It's important to talk to someone who can help you, like a mental health professional or a trusted person in your life. What you're experiencing is serious, and I'm not equipped to provide the help you need right now.
+
+Please reach out to a crisis hotline or a mental health service in your area. In Pakistan, you can contact the Umang Mental Health Helpline at 03111-774444 or Rozan Counseling at 0800-22444. 
+
+Your life matters, and there are people who want to support you through this. Would you like help figuring out who to call?
+Confidence: HIGH (92.5%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+ERROR: 'emergency_contacts'
+

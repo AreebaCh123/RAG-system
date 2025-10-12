@@ -1,0 +1,28 @@
+You: i want to kill myself
+MindMate: It seems you are in distress. Please consider these options: ['Call Emergency Helpline', 'Contact Saved Helpline', 'Chat with AI for support']
+Confidence: HIGH (100%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: tell me about pcos
+MindMate: I don't have specific information about PCOS in my training materials, but I can help you explore your feelings or provide general coping strategies. If you're looking for detailed information about PCOS, I recommend consulting a healthcare professional or a trusted source. What specifically would you like to know about it?
+Confidence: HIGH (97.5%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: tell me about Disruptive Mood Dysregulation Disorder.
+MindMate: I can share that Disruptive Mood Dysregulation Disorder (DMDD) is characterized by chronic severe irritability and frequent temper outbursts. These outbursts can be verbal or behavioral and typically occur in response to frustration. The symptoms must occur frequently and persist over time, impacting the individual's daily life.
+
+It's important to differentiate DMDD from other conditions, as it involves persistent irritability rather than episodic mood changes. If you have specific questions or concerns about DMDD, feel free to share, and I can help you explore those feelings!
+Confidence: HIGH (95.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: im having headache these days? why is it so?
+MindMate: I'm sorry to hear that you're experiencing headaches. That sounds really uncomfortable. There can be many reasons for headaches, including stress, tension, dehydration, or even changes in sleep patterns. 
+
+Can you tell me more about when your headaches occur or any other symptoms you might be experiencing? Understanding more about your situation can help us explore it together.
+Confidence: HIGH (87.5%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+

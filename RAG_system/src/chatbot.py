@@ -2,6 +2,9 @@ import os
 import re
 from datetime import datetime
 from typing import List, Dict
+from dotenv import load_dotenv
+
+
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -9,10 +12,14 @@ from langchain.chains import create_history_aware_retriever, create_retrieval_ch
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.documents import Document
+
 from prompt import build_system_prompt, CONTEXTUALIZE_PROMPT
 import numpy as np
-from config import INDEX_NAME, EMBEDDING_MODEL
 
+from config import INDEX_NAME, EMBEDDING_MODEL
+from twilio.rest import Client
+
+# ======================== CrossEncoder (Optional) ========================
 try:
     from sentence_transformers import CrossEncoder
     CROSSENCODER_AVAILABLE = True
@@ -21,7 +28,64 @@ except ImportError:
     print("⚠️  Warning: sentence_transformers not available. Reranking disabled.")
     print("   Run: pip install --upgrade sentence-transformers")
 
+# Load .env file
+load_dotenv()
 
+# Twilio credentials
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
+
+# Initialize Twilio client
+twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+# Example user profile
+users = {
+    "user1": {
+        "name": "Alice",
+        "emergency_contacts": ["+923295502805"]
+    }
+}
+
+# ======================== Crisis Detection ========================
+def detect_crisis_intent(user_input: str) -> bool:
+    """Return True only if message clearly expresses self-harm intent."""
+    text = user_input.lower()
+    crisis_patterns = [
+        r"\bi want to (kill|hurt|harm) myself\b",
+        r"\bi (feel|am) suicidal\b",
+        r"\bi can't go on\b",
+        r"\bi don't want to live\b",
+        r"\bi wish i were dead\b",
+        r"\bi am going to end my life\b",
+        r"\bi plan to (kill|hurt|harm) myself\b"
+    ]
+    for pattern in crisis_patterns:
+        if re.search(pattern, text):
+            # Exclude negated statements like "not harm myself"
+            if "not" in text or "never" in text:
+                return False
+            return True
+    return False
+
+
+def send_sms(phone_number: str, message: str):
+    """Send SMS using Twilio."""
+    twilio_client.messages.create(
+        body=message,
+        from_=TWILIO_PHONE_NUMBER,
+        to=phone_number
+    )
+
+
+def handle_crisis(user_id: str, message: str) -> str:
+    """Send alerts to emergency contacts and provide support options."""
+    for contact in users[user_id]["emergency_contacts"]:
+        send_sms(contact, f"⚠️ ALERT: User '{user_id}' may be in crisis. Message: '{message}'")
+
+    options = ["Call Emergency Helpline", "Contact Saved Helpline", "Chat with AI for support"]
+    return f"It seems you are in distress. Please consider these options: {options}"
+
+# ======================== Advanced RAG Retriever ========================
 class AdvancedRAGRetriever:
     def __init__(self, vectorstore, base_k=10, use_reranking=True):
         self.vectorstore = vectorstore
@@ -73,6 +137,7 @@ class AdvancedRAGRetriever:
         return self.rerank_documents(query, documents, top_k=final_k)
 
 
+# ======================== Response Validator ========================
 class ResponseValidator:
     def __init__(self, llm):
         self.llm = llm
@@ -157,6 +222,7 @@ ISSUES: [List specific unsupported claims, or "None"]
             return "VERY_LOW"
 
 
+# ======================== Initialize RAG Chain ========================
 def get_enhanced_conversational_rag_chain(use_reranking=True):
     print("🔗 Initializing enhanced conversational RAG chain...")
     streaming_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3, streaming=True)
@@ -171,31 +237,18 @@ def get_enhanced_conversational_rag_chain(use_reranking=True):
 
 def stream_response_with_validation(query: str, chat_history: list, retriever, llm, validator, past_conversations: str = "") -> Dict:
     context_docs = retriever.retrieve(query)
-    context_text = "\n\n---\n\n".join([
-        f"[Source: {doc.metadata.get('source', 'Unknown')}]\n{doc.page_content}"
-        for doc in context_docs
-    ])
+    context_text = "\n\n---\n\n".join([f"[Source: {doc.metadata.get('source', 'Unknown')}]\n{doc.page_content}" for doc in context_docs])
     system_prompt = build_system_prompt(context_text)
 
-    # ✅ Inject previous chat history context from current session
     if chat_history:
-        previous_context = "\n".join([
-            f"User: {msg.content}" if isinstance(msg, HumanMessage) else f"MindMate: {msg.content}"
-            for msg in chat_history[-10:]  # Last 10 messages from current session
-        ])
+        previous_context = "\n".join([f"User: {msg.content}" if isinstance(msg, HumanMessage) else f"MindMate: {msg.content}" for msg in chat_history[-10:]])
         system_prompt += f"\n\nCurrent Session Context:\n{previous_context}\n"
-    
-    # ✅ Inject past conversations from all previous sessions
+
     if past_conversations:
-        # Truncate if too long to avoid token limits
-        max_past_length = 3000  # Adjust based on your needs
+        max_past_length = 3000
         truncated_past = past_conversations
         if len(past_conversations) > max_past_length:
             truncated_past = past_conversations[-max_past_length:] + "\n... (truncated for length)"
-            print(f"📝 Using {len(past_conversations)} chars of past conversations (truncated to {max_past_length})")
-        else:
-            print(f"📝 Using {len(past_conversations)} chars of past conversations")
-        
         system_prompt += f"\n\nPast Conversation History:\n{truncated_past}\n"
 
     messages = [{"role": "system", "content": system_prompt}]
@@ -220,10 +273,8 @@ def stream_response_with_validation(query: str, chat_history: list, retriever, l
         full_response = response.content
         print(f"\n🤖 MindMate: {full_response}")
 
-    print("\n🔍 Analyzing response...", end="", flush=True)
     validation_result = validator.check_hallucination(full_response, context_docs)
     confidence_result = validator.calculate_confidence_score(full_response, context_docs, validation_result)
-    print("\r" + " " * 30 + "\r", end="", flush=True)
 
     return {
         "answer": full_response,
@@ -233,8 +284,8 @@ def stream_response_with_validation(query: str, chat_history: list, retriever, l
     }
 
 
+# ======================== Load Previous Chat Logs ========================
 def load_all_chat_logs() -> tuple:
-    """Load all past chat logs and return both message objects and raw text"""
     chat_history = []
     past_conversations = ""
     log_dir = "chat_logs"
@@ -242,10 +293,8 @@ def load_all_chat_logs() -> tuple:
     total_messages = 0
     
     if not os.path.exists(log_dir):
-        print("📚 No previous chat logs found. Starting fresh conversation.")
         return chat_history, past_conversations, files_loaded, total_messages
 
-    # Get all .txt files and sort them by creation time
     txt_files = [f for f in os.listdir(log_dir) if f.endswith(".txt")]
     txt_files.sort(key=lambda x: os.path.getctime(os.path.join(log_dir, x)))
     
@@ -255,46 +304,36 @@ def load_all_chat_logs() -> tuple:
             with open(file_path, "r", encoding="utf-8") as f:
                 file_content = f.read()
                 past_conversations += f"\n\n--- Conversation from {file} ---\n{file_content}"
-                
-                # Parse messages for chat history
                 for line in file_content.split('\n'):
                     if line.startswith("You: "):
                         content = line.replace("You: ", "").strip()
-                        if content:  # Only add non-empty messages
+                        if content:
                             chat_history.append(HumanMessage(content=content))
                             total_messages += 1
                     elif line.startswith("MindMate: "):
                         content = line.replace("MindMate: ", "").strip()
-                        if content:  # Only add non-empty messages
+                        if content:
                             chat_history.append(AIMessage(content=content))
                             total_messages += 1
                 files_loaded += 1
         except Exception as e:
-            print(f"⚠️  Warning: Could not read {file}: {e}")
-    
-    print(f"📚 Loaded {files_loaded} chat log files with {total_messages} total messages.")
-    print(f"💾 Total conversation history: {len(past_conversations)} characters")
+            print(f"⚠️ Warning: Could not read {file}: {e}")
     
     return chat_history, past_conversations, files_loaded, total_messages
 
 
+# ======================== Main Chat Loop ========================
 if __name__ == "__main__":
     retriever, llm, validator = get_enhanced_conversational_rag_chain(use_reranking=True)
-    
-    # Load all previous conversations at startup (done once for performance)
-    print("🔄 Loading conversation memory...")
     chat_history, past_conversations, files_loaded, total_messages = load_all_chat_logs()
-    
-    # Store past conversations globally to avoid reloading
     GLOBAL_PAST_CONVERSATIONS = past_conversations
 
     print("\n" + "="*70)
     print("🧠 MindMate - Your Mental Health Companion")
     print("="*70)
-    rerank_status = " Enabled" if CROSSENCODER_AVAILABLE else "❌ Disabled (install sentence-transformers)"
+    rerank_status = " Enabled" if CROSSENCODER_AVAILABLE else "❌ Disabled"
     print(f"✨ Features: Therapeutic AI | Evidence-Based Support | Crisis Awareness")
     print(f"🔄 Reranking: {rerank_status}")
-    print(f"📊 Confidence Scoring | Hallucination Detection")
     print(f"💾 Memory Loaded: {files_loaded} files, {total_messages} messages")
     print("\n💡 This chatbot provides support but is NOT a replacement for therapy.")
     print("Type 'exit' to end the conversation.\n")
@@ -311,26 +350,34 @@ if __name__ == "__main__":
             continue
 
         try:
-            result = stream_response_with_validation(user_input, chat_history, retriever, llm, validator, GLOBAL_PAST_CONVERSATIONS)
-            answer = result['answer']
-            confidence = result['confidence']
-            validation = result['validation']
+            # ===== Crisis Detection =====
+            if detect_crisis_intent(user_input):
+                answer = handle_crisis("user1", user_input)
+                validation = {"hallucination": False}
+                confidence = {"overall_confidence": 100, "level": "HIGH"}
+            else:
+                result = stream_response_with_validation(user_input, chat_history, retriever, llm, validator, GLOBAL_PAST_CONVERSATIONS)
+                answer = result['answer']
+                validation = result['validation']
+                confidence = result['confidence']
+
             confidence_emoji = "🟢" if confidence['level'] == "HIGH" else "🟡" if confidence['level'] == "MEDIUM" else "🔴"
             print(f"\n{confidence_emoji} Confidence: {confidence['level']} ({confidence['overall_confidence']}%)")
-            if validation['hallucination']:
+            if validation.get('hallucination'):
                 print(f"⚠️  Warning: Potential unsupported claims detected")
 
             with open(log_file, "a", encoding="utf-8") as f:
                 f.write(f"You: {user_input}\n")
                 f.write(f"MindMate: {answer}\n")
                 f.write(f"Confidence: {confidence['level']} ({confidence['overall_confidence']}%)\n")
-                f.write(f"Hallucination Check: {'FLAGGED' if validation['hallucination'] else '✅ PASSED'}\n")
-                f.write("-" * 70 + "\n\n")
+                f.write(f"Hallucination Check: {'FLAGGED' if validation.get('hallucination') else '✅ PASSED'}\n")
+                f.write("-"*70 + "\n\n")
 
             chat_history.append(HumanMessage(content=user_input))
             chat_history.append(AIMessage(content=answer))
             if len(chat_history) > 50:
                 chat_history = chat_history[-50:]
+
         except Exception as e:
             print(f"\n❌ MindMate: Sorry, I'm having trouble processing that right now.")
             print(f"   Debug: {str(e)}")

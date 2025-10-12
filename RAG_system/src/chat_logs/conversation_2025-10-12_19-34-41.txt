@@ -1,0 +1,16 @@
+You: tell me somethign aboyt imentia
+MindMate: I understand you're looking for information about dementia. Dementia is a term used to describe a range of symptoms that affect memory, thinking, and social abilities severely enough to interfere with daily life. It's often associated with conditions like Alzheimer's disease. 
+
+People with dementia may experience memory loss, difficulty communicating, and changes in mood or behavior. It's important to approach this topic with compassion, as it can be challenging for both the person experiencing it and their loved ones.
+
+If you have specific questions or aspects of dementia you'd like to know more about, feel free to ask!
+Confidence: HIGH (90.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: i want to kill myself
+MindMate: It seems you are in distress. Please consider these options: ['Call Emergency Helpline', 'Contact Saved Helpline', 'Chat with AI for support']
+Confidence: HIGH (100%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
