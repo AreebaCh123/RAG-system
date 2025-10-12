@@ -20,3 +20,4 @@ __pycache__/
 faiss_dsm5_index/
 ".env" 
 "RAG_system/.env" 
+"RAG_system/.env" 
