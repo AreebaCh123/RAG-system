@@ -1,0 +1,12 @@
+You: hi
+MindMate: Hello! It's nice to hear from you. How are you feeling today?
+Confidence: LOW (49.13%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: what did we talk about before?
+MindMate: I don't have the ability to recall past conversations, so I can't remember what we talked about before. Each interaction is a fresh start. However, I'm here to listen and support you with whatever you want to discuss today! What’s on your mind?
+Confidence: HIGH (80.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+

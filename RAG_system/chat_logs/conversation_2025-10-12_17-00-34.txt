@@ -1,0 +1,36 @@
+You: hey
+MindMate: Hi there! It’s good to hear from you. How are you feeling today?
+Confidence: LOW (48.7%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: do u remember what we talked about last tie?
+MindMate: I don’t have the ability to remember past conversations, so I can’t recall what we talked about last time. Each chat is a fresh start! If there’s something specific you’d like to discuss or revisit, feel free to share, and I’m here to help.
+Confidence: LOW (51.2%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: do u remeber my name?
+MindMate: Yes, I remember that your name is Areeba. How can I assist you today?
+Confidence: HIGH (95.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: i told you that i want to die and you gave me an emergency number? give me that number again>
+MindMate: I'm really concerned about what you've shared with me. It's important to talk to someone who can help you. If you're feeling this way, please reach out to a mental health professional or a crisis hotline. 
+
+In Pakistan, you can contact:
+- Umang Mental Health Helpline: 03111-774444 (Free, 24/7)
+- Rozan Counseling: 0800-22444
+
+Your life matters, and what you're feeling is valid. Please consider reaching out to one of these resources. Would you like help figuring out who to call?
+Confidence: HIGH (90.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: my grandmother has dimentia
+MindMate: I'm really sorry to hear that your grandmother has dementia. That must be a difficult situation for both her and your family. It’s completely understandable to feel a range of emotions when a loved one is facing such challenges. Can you share more about how this is affecting you or what you're experiencing?
+Confidence: HIGH (95.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+

@@ -1,0 +1,138 @@
+You: hey
+MindMate: Hi there! It’s good to hear from you. How are you feeling today?
+Confidence: LOW (48.7%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: im not feeling good today
+MindMate: I'm really sorry to hear that you're not feeling good today. It sounds like you're going through a tough time. Can you share a bit more about what's been on your mind or what you're experiencing?
+Confidence: HIGH (95.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: my midterm exams are coming and i dont know how to study
+MindMate: It makes complete sense that you’re feeling overwhelmed with midterm exams approaching. That can be really stressful, especially when you're unsure about how to prepare. Can you tell me more about what subjects you're studying or what specific challenges you're facing with your study plan?
+Confidence: HIGH (95.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: can you tell me a joke?
+MindMate: I hear that you're looking for a little lightness to lift your spirits. Here’s a joke for you:
+
+Why did the scarecrow win an award?  
+Because he was outstanding in his field!
+
+I hope that brought a smile to your face! If you’d like to talk more about your exams or anything else, I’m here for you.
+Confidence: LOW (48.7%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: how can i calm myself during a panic attac
+MindMate: I'm really sorry to hear that you're experiencing panic attacks; that sounds incredibly overwhelming. It's completely understandable to want to find ways to calm yourself during those moments. 
+
+One technique that might help is called **grounding**. This involves focusing on your senses to bring yourself back to the present moment. Here’s a simple exercise you can try:
+
+1. **5-4-3-2-1 Technique:**
+   - **5 things you can see:** Look around and notice your surroundings. What do you see?
+   - **4 things you can touch:** Notice the texture of objects around you. What can you feel?
+   - **3 things you can hear:** Listen closely. What sounds do you notice?
+   - **2 things you can smell:** If you can, take a moment to notice any scents in the air.
+   - **1 thing you can taste:** Focus on your mouth. What do you taste?
+
+This exercise can help redirect your focus and reduce the intensity of the panic. 
+
+Remember, I'm here to support you, but connecting with a therapist can provide personalized guidance. You're taking an important step by reaching out, and I'm here whenever you need support. Would you like to explore this further, or is there something else on your mind?
+Confidence: HIGH (90.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: i dont see any reasons to live
+MindMate: I'm really concerned about what you've shared with me. It sounds like you're in a very painful place right now, and I want you to know that your feelings are valid. 
+
+What you're experiencing is serious, and I'm not equipped to provide the help you need right now. It's really important to talk to someone who can, like a mental health professional. They can provide the support and guidance that can help you through this.
+
+Please consider reaching out to a crisis resource or a mental health professional. Your life matters, and there are people who want to help you. If you're in Pakistan, you can contact the Umang Mental Health Helpline at 03111-774444, which is available 24/7.
+
+Would you like help figuring out who to call, or is there something else you’d like to talk about?
+Confidence: HIGH (90.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: What are the diagnostic criteria for ADHD?
+MindMate: I appreciate your curiosity about ADHD, but I want to remind you that I'm not able to provide diagnoses or medical advice. However, I can share some general information about ADHD based on what I know.
+
+The essential feature of ADHD is a persistent pattern of inattention and/or hyperactivity-impulsivity that interferes with functioning or development. Some common symptoms of inattention include difficulty sustaining focus, being disorganized, and failing to follow through on tasks. Hyperactivity may manifest as excessive motor activity or restlessness, while impulsivity involves hasty actions without forethought.
+
+If you have specific questions or concerns about ADHD, I encourage you to reach out to a mental health professional who can provide personalized guidance. 
+
+Is there anything else you’d like to explore or discuss?
+Confidence: HIGH (92.5%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: wehre are you getting repsonses from?
+MindMate: I understand your curiosity! My responses are based on a combination of training in mental health concepts and guidelines for providing support. I don’t pull information from the internet or external sources in real-time; instead, I rely on the knowledge and context I was trained on, which includes evidence-based practices in mental health support.
+
+If you have any specific questions or topics you'd like to discuss, feel free to share! I'm here to help.
+Confidence: HIGH (92.5%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: “How long does therapy usually take to work?
+MindMate: It's completely normal to wonder about the timeline for therapy and how long it might take to see progress. The duration of therapy can vary widely depending on several factors, including the individual’s specific situation, the type of therapy being used, and personal goals.
+
+Some people may start to notice changes within a few sessions, while others might take several months to see significant progress. Research shows that many individuals experience improvement in symptoms within 6 to 12 sessions, but it can take longer for deeper issues to be addressed.
+
+It's also important to remember that therapy is a process, and everyone's journey is unique. Open communication with your therapist about your goals and progress can help you understand what to expect.
+
+If you're considering therapy or have more questions about it, I'm here to support you! Would you like to explore this further or discuss something else?
+Confidence: MEDIUM (75.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: i miss my friend so much
+MindMate: I can hear how much pain you're feeling from missing your friend. That sounds really tough, especially if you had a close bond. It's completely natural to feel a sense of loss when someone important to us isn't around.
+
+Can you share a bit more about what you miss most about your friend? What kind of memories or moments come to mind when you think of them?
+Confidence: HIGH (95.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: kya haal hai?
+MindMate: Mera haal theek hai, shukriya! Aap kaise hain? Aapko kya mehsoos ho raha hai?
+Confidence: HIGH (100.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: what is anxiety?
+MindMate: Anxiety is a feeling of worry, fear, or unease about something that may happen in the future. It's a normal response to stress and can even be helpful in some situations, like when it motivates you to prepare for an exam or meet a deadline. However, when anxiety becomes excessive or persistent, it can interfere with daily life and may be classified as an anxiety disorder.
+
+Common symptoms of anxiety can include restlessness, rapid heartbeat, difficulty concentrating, and feelings of impending doom. It's important to remember that everyone experiences anxiety differently, and what might be overwhelming for one person may not be the same for another.
+
+If you're feeling anxious, I'm here to support you. Would you like to talk more about what you're experiencing or explore some coping strategies?
+Confidence: MEDIUM (72.5%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: how it is treated?
+MindMate: It sounds like you're looking for information on how anxiety can be treated, which is a great question. There are several effective approaches to treating anxiety, and the best method often depends on the individual and their specific situation. Here are some common treatment options:
+
+1. **Therapy:** Cognitive Behavioral Therapy (CBT) is one of the most effective forms of therapy for anxiety. It helps individuals identify and change negative thought patterns and behaviors that contribute to their anxiety.
+
+2. **Medication:** Some people may benefit from medication prescribed by a healthcare professional. This can include antidepressants or anti-anxiety medications, but it's important to discuss this with a doctor.
+
+3. **Lifestyle Changes:** Regular exercise, a balanced diet, and adequate sleep can significantly impact anxiety levels. Mindfulness practices, such as meditation or yoga, can also help reduce anxiety.
+
+4. **Support Groups:** Connecting with others who understand what you're going through can provide comfort and encouragement.
+
+If you're experiencing anxiety, I encourage you to reach out to a mental health professional who can provide personalized guidance and support. You're taking an important step by seeking information, and I'm here to help you explore this further if you'd like!
+Confidence: HIGH (92.5%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: do u remember i asked you about my name yesterday or not?
+MindMate: I don't have the ability to remember past conversations or details from previous chats. Each interaction is separate, so I don't retain any information about you or our discussions. However, I'm here to support you in the moment! If you'd like to share your name or anything else, feel free to do so. How can I assist you today?
+Confidence: HIGH (95.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+

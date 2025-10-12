@@ -1,0 +1,58 @@
+# -----------------------
+# Python
+# -----------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# -----------------------
+# Virtual Environment
+# -----------------------
+venv/
+.env/
+ENV/
+env/
+.venv/
+
+# -----------------------
+# Environment & Secrets
+# -----------------------
+.env
+*.env
+.env.*
+!env.template  # keep env.template visible
+
+
+# -----------------------
+# OS / IDE / Editor Files
+# -----------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------
+# Cache & Build
+# -----------------------
+__pycache__/
+build/
+dist/
+*.egg-info/
+*.egg
+.cache/
+.pytest_cache/
+*.spec
+
+# -----------------------
+# Jupyter / Notebook
+# -----------------------
+.ipynb_checkpoints/
+
+# -----------------------
+# Other
+# -----------------------
+*.bak
+*.old
+*.temp

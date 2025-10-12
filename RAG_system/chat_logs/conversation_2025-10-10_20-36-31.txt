@@ -1,0 +1,6 @@
+ERROR: HTTPSConnectionPool(host='mindmate-7ntz7zl.svc.aped-4627-b74a.pinecone.io', port=443): Max retries exceeded with url: /query (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001C524FFD720>: Failed to resolve 'mindmate-7ntz7zl.svc.aped-4627-b74a.pinecone.io' ([Errno 11002] getaddrinfo failed)"))
+
+ERROR: Connection error.
+
+ERROR: Connection error.
+

@@ -1,0 +1,14 @@
+You: hey bro
+MindMate: Hello! I'm here to help. How are you feeling today?
+
+You: im feeling so sad honestly
+MindMate: I'm really sorry to hear that you're feeling this way. It's okay to feel sad sometimes, and it's important to acknowledge those feelings. If you'd like to talk about what's been on your mind, I'm here to listen. Remember, reaching out to a licensed mental health professional can also be a great step in finding support.
+
+You: 
+MindMate: It seems like you might be feeling a bit overwhelmed or unsure about what to say. That's completely okay. If you want to share more about what's making you feel sad, I'm here to listen. If you prefer not to talk about it right now, that's also perfectly fine. Just know that you're not alone.
+
+You: bro i feel like killing myself
+MindMate: I'm really sorry to hear that you're feeling this way. It's very important to talk to someone who can help you, like a mental health professional or a trusted person in your life. You deserve support and care. Please consider reaching out to a crisis hotline or a professional who can provide immediate help. You are not alone, and there are people who want to help you through this.
+
+ERROR: HTTPSConnectionPool(host='mindmate-7ntz7zl.svc.aped-4627-b74a.pinecone.io', port=443): Max retries exceeded with url: /query (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x00000202E9B39750>: Failed to resolve 'mindmate-7ntz7zl.svc.aped-4627-b74a.pinecone.io' ([Errno 11002] getaddrinfo failed)"))
+

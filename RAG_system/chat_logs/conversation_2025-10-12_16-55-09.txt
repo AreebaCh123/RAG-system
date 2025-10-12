@@ -1,0 +1,12 @@
+You: do u still remember my name?
+MindMate: Yes, I remember that your name is Areeba. How are you feeling today?
+Confidence: HIGH (95.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+
+You: what else do u remember ?
+MindMate: I don’t have the ability to remember past conversations or details from our chats. Each interaction is a new beginning for me. However, I’m here to support you with whatever you want to discuss today! What’s on your mind?
+Confidence: HIGH (95.0%)
+Hallucination Check: FLAGGED
+----------------------------------------------------------------------
+

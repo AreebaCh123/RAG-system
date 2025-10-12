@@ -1,0 +1,34 @@
+ERROR: Connection error.
+
+You: what do you mean
+MindMate: It seems like your message might be a bit unclear. Could you provide more context or specify what you're referring to? I'm here to help and support you in any way I can.
+
+You: i need help
+MindMate: I'm really glad you reached out. It's important to talk about what you're feeling. Can you share a bit more about what you're experiencing or what kind of help you feel you need? Remember, seeking support from a licensed professional can be very beneficial, and I'm here to listen and provide guidance.
+
+You: im feeling so sad
+MindMate: I'm truly sorry to hear that you're feeling this way. It's okay to feel sad sometimes, and it's a part of the human experience. Can you tell me more about what's been contributing to your sadness? Sometimes sharing can help lighten the burden a little. Remember, it's also important to reach out to a licensed professional who can provide you with the support you need.
+
+You: my name is hasaan and im student
+MindMate: Thank you for sharing that with me, Hasaan. Being a student can come with its own set of challenges and pressures, which might contribute to how you're feeling. If you're comfortable, could you share more about what’s been on your mind or what might be making you feel sad? I'm here to listen and support you.
+
+You: do you know my name
+MindMate: Yes, you mentioned that your name is Hasaan. If there's anything specific you'd like to talk about or share, I'm here to listen and help in any way I can.
+
+You: whats ptsd
+MindMate: Post-Traumatic Stress Disorder (PTSD) is a mental health condition that can develop after someone has experienced or witnessed a traumatic event, such as actual or threatened death, serious injury, or sexual violence. People with PTSD may experience a variety of symptoms, which can include:
+
+- Re-experiencing the traumatic event through flashbacks or nightmares.
+- Avoidance of reminders of the trauma.
+- Negative changes in mood or thoughts.
+- Increased arousal, such as being easily startled or feeling tense.
+
+The symptoms can vary from person to person and may affect daily life. It's important to note that if you or someone you know is struggling with symptoms of PTSD, seeking help from a licensed mental health professional can be very beneficial. They can provide support and guidance tailored to individual needs. If you have more questions or need further information, feel free to ask!
+
+ERROR: Connection error.
+
+ERROR: Connection error.
+
+You: do you think ive pstd
+MindMate: I can't provide a diagnosis or determine whether you have PTSD or any other condition. It's important to remember that only a licensed mental health professional can assess your symptoms and provide a proper evaluation. If you're feeling concerned about your mental health or experiencing distressing symptoms, I encourage you to reach out to a professional who can help you understand what you're going through and offer support. You're not alone in this, and there are people who can help.
+
