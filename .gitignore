@@ -20,3 +20,4 @@ __pycache__/
 faiss_dsm5_index/
 
 
+"RAG_system/src/chat_logs/*.txt" 

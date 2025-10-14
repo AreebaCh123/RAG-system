@@ -1,0 +1,6 @@
+You: hi
+MindMate: Hi there! It’s great to hear from you. How are you feeling today?
+Confidence: LOW (50.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+

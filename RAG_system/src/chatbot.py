@@ -1,10 +1,15 @@
 import os
 import re
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Any
 from dotenv import load_dotenv
 
+# Load .env early
+load_dotenv()
 
+import openai
+import numpy as np
+from sentence_transformers import SentenceTransformer, util
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -14,10 +19,34 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.documents import Document
 
 from prompt import build_system_prompt, CONTEXTUALIZE_PROMPT
-import numpy as np
-
 from config import INDEX_NAME, EMBEDDING_MODEL
 from twilio.rest import Client
+
+# Load SentenceTransformer for semantic crisis detection
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# ======================== OpenRouter / OpenAI config ========================
+OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", "https://openrouter.ai/api/v1")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+if OPENAI_API_KEY:
+    openai.api_base = OPENAI_API_BASE
+    openai.api_key = OPENAI_API_KEY
+else:
+    print("⚠️  Warning: OPENAI_API_KEY not found in environment. Set it in .env")
+
+OPENROUTER_APP_NAME = os.getenv("OPENROUTER_APP_NAME")
+OPENROUTER_SITE_URL = os.getenv("OPENROUTER_SITE_URL")
+if OPENROUTER_APP_NAME or OPENROUTER_SITE_URL:
+    headers = {}
+    if OPENROUTER_SITE_URL:
+        headers["HTTP-Referer"] = OPENROUTER_SITE_URL
+    if OPENROUTER_APP_NAME:
+        headers["X-Title"] = OPENROUTER_APP_NAME
+    try:
+        openai.default_headers = headers
+    except Exception:
+        pass
 
 # ======================== CrossEncoder (Optional) ========================
 try:
@@ -25,20 +54,18 @@ try:
     CROSSENCODER_AVAILABLE = True
 except ImportError:
     CROSSENCODER_AVAILABLE = False
-    print("⚠️  Warning: sentence_transformers not available. Reranking disabled.")
-    print("   Run: pip install --upgrade sentence-transformers")
+    print("⚠️  Warning: sentence_transformers CrossEncoder not available. Reranking disabled.")
 
-# Load .env file
-load_dotenv()
-
-# Twilio credentials
+# ======================== Twilio Setup ========================
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 
-# Initialize Twilio client
+if not (TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN and TWILIO_PHONE_NUMBER):
+    print("⚠️  Warning: Twilio credentials not fully set. SMS may fail.")
+
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-# Example user profile
+
 users = {
     "user1": {
         "name": "Alice",
@@ -46,45 +73,89 @@ users = {
     }
 }
 
-# ======================== Crisis Detection ========================
-def detect_crisis_intent(user_input: str) -> bool:
-    """Return True only if message clearly expresses self-harm intent."""
-    text = user_input.lower()
-    crisis_patterns = [
-        r"\bi want to (kill|hurt|harm) myself\b",
-        r"\bi (feel|am) suicidal\b",
-        r"\bi can't go on\b",
-        r"\bi don't want to live\b",
-        r"\bi wish i were dead\b",
-        r"\bi am going to end my life\b",
-        r"\bi plan to (kill|hurt|harm) myself\b"
+# ======================== Text Extraction Helper ========================
+def extract_text_from_response(resp: Any) -> str:
+    if resp is None:
+        return ""
+    if isinstance(resp, str):
+        return resp
+    if hasattr(resp, "content"):
+        try:
+            return str(resp.content)
+        except Exception:
+            pass
+    if isinstance(resp, dict):
+        if "data" in resp and isinstance(resp["data"], list) and len(resp["data"]) > 0:
+            first = resp["data"][0]
+            for key in ("text", "content", "message", "answer"):
+                if isinstance(first, dict) and key in first:
+                    return str(first[key])
+            return str(first)
+        for key in ("content", "message", "text", "answer"):
+            if key in resp:
+                return str(resp[key])
+    if isinstance(resp, (list, tuple)) and len(resp) > 0:
+        return extract_text_from_response(resp[0])
+    try:
+        return str(resp)
+    except Exception:
+        return ""
+
+# ======================== Crisis Detection (Semantic) ========================
+def detect_crisis_intent_semantic(user_input: str, threshold=0.8) -> bool:
+    """
+    Uses sentence-transformers to catch semantically similar crisis messages.
+    Example: "I can't do this anymore" ≈ "I can't go on"
+    """
+    crisis_examples = [
+        "I want to die",
+        "I can’t go on",
+        "I can’t do this anymore",
+        "I don’t want to live",
+        "I want to hurt myself",
+        "I wish I were dead"
     ]
-    for pattern in crisis_patterns:
-        if re.search(pattern, text):
-            # Exclude negated statements like "not harm myself"
-            if "not" in text or "never" in text:
-                return False
-            return True
-    return False
+    embeddings = model.encode([user_input] + crisis_examples, convert_to_tensor=True)
+    user_emb, crisis_embs = embeddings[0], embeddings[1:]
+    cosine_scores = util.cos_sim(user_emb, crisis_embs)
+    return any(score > threshold for score in cosine_scores[0])
 
-
+# ======================== Crisis Handling ========================
 def send_sms(phone_number: str, message: str):
-    """Send SMS using Twilio."""
-    twilio_client.messages.create(
-        body=message,
-        from_=TWILIO_PHONE_NUMBER,
-        to=phone_number
-    )
+    try:
+        twilio_client.messages.create(
+            body=message,
+            from_=TWILIO_PHONE_NUMBER,
+            to=phone_number
+        )
+        print(f"📩 SMS sent to {phone_number}")
+    except Exception as e:
+        print(f"⚠️  Failed to send SMS to {phone_number}: {e}")
+
+
 
 
 def handle_crisis(user_id: str, message: str) -> str:
-    """Send alerts to emergency contacts and provide support options."""
+    # Notify emergency contacts via SMS
     for contact in users[user_id]["emergency_contacts"]:
-        send_sms(contact, f"⚠️ ALERT: User '{user_id}' may be in crisis. Message: '{message}'")
+        send_sms(
+            contact,
+            f"⚠️ ALERT: User '{user_id}' may be in crisis. Message: '{message}'"
+        )
 
-    options = ["Call Emergency Helpline", "Contact Saved Helpline", "Chat with AI for support"]
-    return f"It seems you are in distress. Please consider these options: {options}"
+    # Build empathetic message for chatbot display
+    options = [
+        "📞 Call Emergency Helpline (e.g., 1122 in Pakistan)",
+        "☎️ Contact a Saved Helpline Contact",
+        "💬 Chat with AI for Support"
+    ]
 
+    return (
+        "💛 It seems you’re going through a really difficult time.\n"
+        "You are *not alone* — please consider these immediate options:\n\n"
+        + "\n".join(f"- {opt}" for opt in options)
+        + "\n\nIf you're in danger, please reach out for help right now. 💛"
+    )
 # ======================== Advanced RAG Retriever ========================
 class AdvancedRAGRetriever:
     def __init__(self, vectorstore, base_k=10, use_reranking=True):
@@ -132,10 +203,23 @@ class AdvancedRAGRetriever:
     def retrieve(self, query: str) -> List[Document]:
         dynamic_k = self.calculate_dynamic_k(query)
         retriever = self.vectorstore.as_retriever(search_kwargs={'k': dynamic_k})
-        documents = retriever.invoke(query)
+        # Prefer the new .invoke API when available (avoids deprecation warnings).
+        try:
+            documents = retriever.invoke(query)
+        except Exception:
+            # fallback: try common alternate method names
+            try:
+                documents = retriever.get_relevant_documents(query)
+            except Exception:
+                try:
+                    # Some retrievers expect 'get_relevant_documents' with kw
+                    documents = retriever.get_relevant_documents(query, k=dynamic_k)
+                except Exception as e:
+                    print(f"⚠️  Retriever failed to return documents: {e}")
+                    documents = []
+
         final_k = min(4, len(documents))
         return self.rerank_documents(query, documents, top_k=final_k)
-
 
 # ======================== Response Validator ========================
 class ResponseValidator:
@@ -163,19 +247,24 @@ CONFIDENCE: [0-100]
 ISSUES: [List specific unsupported claims, or "None"]
 """
         try:
-            validation_response = self.llm.invoke(validation_prompt)
-            return self._parse_validation_response(validation_response.content)
-        except Exception:
+            raw = self.llm.invoke(validation_prompt)
+            raw_text = extract_text_from_response(raw)
+            return self._parse_validation_response(raw_text)
+        except Exception as e:
+            print(f"⚠️  Validation LLM failed: {e}")
             return {"hallucination": False, "confidence": 50, "issues": []}
 
     def _parse_validation_response(self, response: str) -> Dict:
-        hallucination = "YES" in response.split("HALLUCINATION:")[1].split("\n")[0].upper()
+        try:
+            hallucination = "YES" in response.split("HALLUCINATION:")[1].split("\n")[0].upper()
+        except Exception:
+            hallucination = False
         confidence_match = re.search(r'CONFIDENCE:\s*(\d+)', response)
         confidence = int(confidence_match.group(1)) if confidence_match else 50
         try:
             issues_text = response.split("ISSUES:")[1].strip()
             issues = [issues_text] if issues_text.lower() != "none" else []
-        except:
+        except Exception:
             issues = []
         return {
             "hallucination": hallucination,
@@ -221,19 +310,36 @@ ISSUES: [List specific unsupported claims, or "None"]
         else:
             return "VERY_LOW"
 
-
 # ======================== Initialize RAG Chain ========================
 def get_enhanced_conversational_rag_chain(use_reranking=True):
     print("🔗 Initializing enhanced conversational RAG chain...")
-    streaming_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3, streaming=True)
-    validation_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, streaming=False)
-    embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)
+
+    streaming_llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0.3,
+        streaming=True,
+        openai_api_key=OPENAI_API_KEY,
+        openai_api_base=OPENAI_API_BASE
+    )
+    validation_llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0,
+        streaming=False,
+        openai_api_key=OPENAI_API_KEY,
+        openai_api_base=OPENAI_API_BASE
+    )
+
+    embeddings = OpenAIEmbeddings(
+        model=EMBEDDING_MODEL,
+        openai_api_key=OPENAI_API_KEY,
+        openai_api_base=OPENAI_API_BASE
+    )
+
     vectorstore = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
     advanced_retriever = AdvancedRAGRetriever(vectorstore, use_reranking=use_reranking)
     validator = ResponseValidator(validation_llm)
     print("✅ Enhanced conversational RAG chain initialized successfully.")
     return advanced_retriever, streaming_llm, validator
-
 
 def stream_response_with_validation(query: str, chat_history: list, retriever, llm, validator, past_conversations: str = "") -> Dict:
     context_docs = retriever.retrieve(query)
@@ -261,17 +367,27 @@ def stream_response_with_validation(query: str, chat_history: list, retriever, l
 
     print("\n🤖 MindMate: ", end="", flush=True)
     full_response = ""
+
+    # streaming path (preferred)
     try:
-        for chunk in llm.stream(messages):
-            if chunk.content:
-                print(chunk.content, end="", flush=True)
-                full_response += chunk.content
+        stream_iter = llm.stream(messages)
+        for chunk in stream_iter:
+            # chunk may be a dict-like or object with content
+            chunk_text = extract_text_from_response(chunk)
+            if chunk_text:
+                print(chunk_text, end="", flush=True)
+                full_response += chunk_text
         print()
     except Exception as e:
-        print(f"\n❌ Streaming error: {e}")
-        response = llm.invoke(messages)
-        full_response = response.content
-        print(f"\n🤖 MindMate: {full_response}")
+        # fallback to a single call; handle different return shapes
+        print(f"\nℹ️ Streaming not supported or failed: {e}. Falling back to invoke().")
+        try:
+            raw_response = llm.invoke(messages)
+            full_response = extract_text_from_response(raw_response)
+            print(f"\n🤖 MindMate: {full_response}")
+        except Exception as e2:
+            print(f"\n❌ LLM invoke() failed: {e2}")
+            full_response = "Sorry, I'm having trouble generating a response right now."
 
     validation_result = validator.check_hallucination(full_response, context_docs)
     confidence_result = validator.calculate_confidence_score(full_response, context_docs, validation_result)
@@ -283,7 +399,6 @@ def stream_response_with_validation(query: str, chat_history: list, retriever, l
         "confidence": confidence_result
     }
 
-
 # ======================== Load Previous Chat Logs ========================
 def load_all_chat_logs() -> tuple:
     chat_history = []
@@ -291,13 +406,13 @@ def load_all_chat_logs() -> tuple:
     log_dir = "chat_logs"
     files_loaded = 0
     total_messages = 0
-    
+
     if not os.path.exists(log_dir):
         return chat_history, past_conversations, files_loaded, total_messages
 
     txt_files = [f for f in os.listdir(log_dir) if f.endswith(".txt")]
     txt_files.sort(key=lambda x: os.path.getctime(os.path.join(log_dir, x)))
-    
+
     for file in txt_files:
         file_path = os.path.join(log_dir, file)
         try:
@@ -318,9 +433,8 @@ def load_all_chat_logs() -> tuple:
                 files_loaded += 1
         except Exception as e:
             print(f"⚠️ Warning: Could not read {file}: {e}")
-    
-    return chat_history, past_conversations, files_loaded, total_messages
 
+    return chat_history, past_conversations, files_loaded, total_messages
 
 # ======================== Main Chat Loop ========================
 if __name__ == "__main__":
@@ -328,10 +442,10 @@ if __name__ == "__main__":
     chat_history, past_conversations, files_loaded, total_messages = load_all_chat_logs()
     GLOBAL_PAST_CONVERSATIONS = past_conversations
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("🧠 MindMate - Your Mental Health Companion")
-    print("="*70)
-    rerank_status = " Enabled" if CROSSENCODER_AVAILABLE else "❌ Disabled"
+    print("=" * 70)
+    rerank_status = "✅ Enabled" if CROSSENCODER_AVAILABLE else "❌ Disabled"
     print(f"✨ Features: Therapeutic AI | Evidence-Based Support | Crisis Awareness")
     print(f"🔄 Reranking: {rerank_status}")
     print(f"💾 Memory Loaded: {files_loaded} files, {total_messages} messages")
@@ -350,31 +464,49 @@ if __name__ == "__main__":
             continue
 
         try:
-            # ===== Crisis Detection =====
-            if detect_crisis_intent(user_input):
-                answer = handle_crisis("user1", user_input)
+            # ✅ Crisis detection logic (semantic + normal flow)
+            if detect_crisis_intent_semantic(user_input):
+                response = handle_crisis("user1", user_input)
                 validation = {"hallucination": False}
                 confidence = {"overall_confidence": 100, "level": "HIGH"}
             else:
-                result = stream_response_with_validation(user_input, chat_history, retriever, llm, validator, GLOBAL_PAST_CONVERSATIONS)
-                answer = result['answer']
+                result = stream_response_with_validation(
+                    user_input,
+                    chat_history,
+                    retriever,
+                    llm,
+                    validator,
+                    GLOBAL_PAST_CONVERSATIONS
+                )
+                response = result['answer']
                 validation = result['validation']
                 confidence = result['confidence']
 
-            confidence_emoji = "🟢" if confidence['level'] == "HIGH" else "🟡" if confidence['level'] == "MEDIUM" else "🔴"
+            confidence_emoji = (
+                "🟢" if confidence['level'] == "HIGH"
+                else "🟡" if confidence['level'] == "MEDIUM"
+                else "🔴"
+            )
             print(f"\n{confidence_emoji} Confidence: {confidence['level']} ({confidence['overall_confidence']}%)")
+
             if validation.get('hallucination'):
                 print(f"⚠️  Warning: Potential unsupported claims detected")
 
+            # 🟢 Removed duplicate response print here
+            # (stream_response_with_validation() already prints live tokens)
+            # print(f"\n🌿 MindMate: {response}")
+
+            # ✅ Logging
             with open(log_file, "a", encoding="utf-8") as f:
                 f.write(f"You: {user_input}\n")
-                f.write(f"MindMate: {answer}\n")
+                f.write(f"MindMate: {response}\n")
                 f.write(f"Confidence: {confidence['level']} ({confidence['overall_confidence']}%)\n")
                 f.write(f"Hallucination Check: {'FLAGGED' if validation.get('hallucination') else '✅ PASSED'}\n")
-                f.write("-"*70 + "\n\n")
+                f.write("-" * 70 + "\n\n")
 
+            # ✅ Update chat memory
             chat_history.append(HumanMessage(content=user_input))
-            chat_history.append(AIMessage(content=answer))
+            chat_history.append(AIMessage(content=response))
             if len(chat_history) > 50:
                 chat_history = chat_history[-50:]
 

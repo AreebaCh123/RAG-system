@@ -1,0 +1,38 @@
+You: hey
+MindMate: Hi there! It’s great to hear from you. How are you feeling today?
+Confidence: LOW (50.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: im feeling serious depression today
+MindMate: I'm really sorry to hear that you're feeling this way. It sounds really overwhelming. Can you tell me more about what you're experiencing or what might have triggered these feelings? I'm here to listen and support you.
+Confidence: LOW (42.5%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: im having headache
+MindMate: I'm sorry to hear that you're experiencing headaches. That sounds really uncomfortable. Can you tell me more about when your headaches occur or if there are any other symptoms you're noticing? Understanding more about your situation can help us explore it together.
+Confidence: LOW (47.5%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: what is pstd
+MindMate: It sounds like you're asking about PTSD, which stands for Post-Traumatic Stress Disorder. It's a mental health condition that can occur after someone experiences or witnesses a traumatic event. People with PTSD may experience flashbacks, nightmares, severe anxiety, and uncontrollable thoughts about the event. 
+
+If you have specific questions or concerns about PTSD, feel free to share, and I can help you explore those feelings!
+Confidence: LOW (42.5%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: do u remember my  name
+MindMate: I hear that you're feeling a bit frustrated about this. I don’t have the ability to remember names from past conversations. If you’d like, you can share your name with me again! I'm here to support you.
+Confidence: LOW (47.5%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: i wish i were dead
+MindMate: It seems you are in distress. Please consider these options: ['Call Emergency Helpline', 'Contact Saved Helpline', 'Chat with AI for support']
+Confidence: HIGH (100%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+

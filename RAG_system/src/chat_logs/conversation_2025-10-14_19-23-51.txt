@@ -1,0 +1,54 @@
+You: hi
+MindMate: Hi there! It’s great to hear from you. How are you feeling today?
+Confidence: LOW (50.0%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: i want to die
+MindMate: 💛 It seems you’re going through a really difficult time.
+You are *not alone* — please consider these immediate options:
+
+- 📞 Call Emergency Helpline (e.g., 1122 in Pakistan)
+- ☎️ Contact a Saved Helpline Contact
+- 💬 Chat with AI for Support
+
+If you're in danger, please reach out for help right now. 💛
+Confidence: HIGH (100%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: i wish i were dead
+MindMate: 💛 It seems you’re going through a really difficult time.
+You are *not alone* — please consider these immediate options:
+
+- 📞 Call Emergency Helpline (e.g., 1122 in Pakistan)
+- ☎️ Contact a Saved Helpline Contact
+- 💬 Chat with AI for Support
+
+If you're in danger, please reach out for help right now. 💛
+Confidence: HIGH (100%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: i feel like im facing gender dysphoria. can you tell me about that?
+MindMate: I hear that you're feeling a lot of confusion and discomfort regarding your gender identity. Gender dysphoria is a term used to describe the psychological distress that can occur when a person's gender identity does not align with the sex they were assigned at birth. It's completely valid to explore these feelings, and many people experience this in different ways. 
+
+Can you share more about what you're feeling or how this is impacting you? I'm here to listen and support you.
+Confidence: LOW (47.5%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
+You: give me 100 lines on it
+MindMate: I appreciate your interest in learning more about gender dysphoria, but I can't provide a lengthy response like that. However, I can share some key points about it:
+
+1. Gender dysphoria involves a disconnect between a person's experienced or expressed gender and the gender they were assigned at birth.
+2. It can lead to significant emotional distress and discomfort.
+3. Many individuals with gender dysphoria may seek to transition socially, medically, or legally to align their gender identity with their lived experience.
+4. Support from friends, family, and mental health professionals can be crucial for those experiencing gender dysphoria.
+5. It's important to approach this topic with empathy and understanding, as everyone's experience is unique.
+
+If you have specific questions or areas you'd like to explore further, please let me know! I'm here to help.
+Confidence: LOW (42.5%)
+Hallucination Check: ✅ PASSED
+----------------------------------------------------------------------
+
